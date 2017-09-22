@@ -1,0 +1,7 @@
+*.iml
+.idea
+_build
+atlassian-ide-plugin.xml
+node_modules
+*.tscache
+*.tmp.*

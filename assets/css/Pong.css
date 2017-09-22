@@ -1,0 +1,8 @@
+@font-face {
+     font-family: "Pong";
+     src:
+             url(../fonts/joystixmonospace/joystixmonospace.woff) format("woff"),
+             url(../fonts/joystixmonospace/joystixmonospace.ttf) format("ttf");
+    font-weight:normal;
+    font-style:normal;
+}
