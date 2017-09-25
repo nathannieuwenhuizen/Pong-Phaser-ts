@@ -19,7 +19,6 @@ class Main_Menu{
             fill: '#fff',
             align: 'center'
         }, callback, this, 300, 100);
-
         this.testGrBtn.createTexture(0x1a1a1a);
 
         this.label = new Label( game, x, y - 200, 'PONG', {
@@ -29,18 +28,15 @@ class Main_Menu{
             , 400, 100);
         this.label.anchor.set(0.5);
 
+        this.graphics.addChild(this.testGrBtn);
+        this.graphics.addChild(this.label);
     }
     public play(): void{
         this.gameplay.restart();
         this.graphics.visible = false;
-        this.label.visible = false;
-        this.testGrBtn.visible = false;
 
     }
     public back_to_menu():void{
-
         this.graphics.visible = true;
-        this.label.visible = true;
-        this.testGrBtn.visible = true;
     }
 }

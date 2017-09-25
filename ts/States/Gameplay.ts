@@ -1,4 +1,5 @@
 import Label = BoilerPlate.Label;
+
 module BoilerPlate {
     import game = PIXI.game;
 
@@ -23,6 +24,8 @@ module BoilerPlate {
         private sprite: Phaser.Sprite;
         private pauseMenu: PauseMenu;
         public pauseBtn: Phaser.Button;
+        public bg: Phaser.Graphics;
+        private bg_color: any;
         constructor() {
             super();
         }
@@ -36,10 +39,13 @@ module BoilerPlate {
             //Send a screen view to Google to track different states
             // this.game.analytics.google.sendScreenView(this.name);
             //this.background = this.game.add.image(0, 0, Atlases.Interface, 'bg_gameplay');
-            var bg = this.game.add.graphics( 0, 0 );
-            bg.beginFill(0x000000, 1);
-            bg.boundsPadding = 0;
-            bg.drawRect(0, 0, this.game.width, this.game.height);
+
+            this.bg = this.game.add.graphics( 0, 0 );
+            this.bg.beginFill(0xFFFFFF, 1);
+            this.bg.boundsPadding = 0;
+            this.bg.drawRect(0, 0, this.game.width, this.game.height);
+            this.bg.tint = 0x000000;
+
             this.in_game = true;
             this.paddle1 = new PlayerPaddle(this.game, 50, this.game.world.height / 2);
             this.game.add.existing(this.paddle1);
@@ -63,17 +69,19 @@ module BoilerPlate {
             });
             this.click_to_start_text.anchor.set(0.5);
             this.pauseMenu = new PauseMenu(this.game.width/2, this.game.height/2, this.game, "pause", "Resume", "Back to menu",this, true);
-            this.pauseBtn = this.game.add.button(50, 50, 'pause', this.pauseMenu.ToggleShow , this.pauseMenu, 2, 1, 0);
+            this.pauseBtn = this.game.add.button(80, 50, 'pause', this.pauseMenu.ToggleShow , this.pauseMenu, 2, 1, 0);
+
+
+            this.in_game = false;
+            this.menu = new Main_Menu(this.game.width/2, this.game.height/2, this.game, this);
+
+
             this.filter = new Void_Filter(this.game);
             this.sprite = this.game.add.sprite( 0,0);
             this.sprite.width = this.game.width;
             this.sprite.height = this.game.height;
             this.sprite.alpha = 0.1;
             this.sprite.filters = [ this.filter.filter_effect ];
-
-            this.in_game = false;
-            this.menu = new Main_Menu(this.game.width/2, this.game.height/2, this.game, this);
-            console.log(this.paddle1.position.x);
 
         }
 
@@ -188,10 +196,19 @@ module BoilerPlate {
 
         }
 
+        private componentToHex(c): void {
+            var hex = c.toString(16);
+            return hex.length == 1 ? "0" + hex : hex;
+        }
+
+        private rgbToHex(r, g, b):void {
+            return "0x" + this.componentToHex(r) + this.componentToHex(g) + this.componentToHex(b);
+        }
+
+
         //gives the ball an angle of direction based on where the ball is hitted
-        public redirect_ball(pad:Paddle,b:Ball): void{
-            let ball = b;
-            let paddle = pad;
+        public redirect_ball(paddle:Paddle,ball:Ball): void{
+            this.bg.tint = this.rgbToHex(Math.round(Math.random()*100),Math.round(Math.random()*100),Math.round(Math.random()*100));
             var dx = -paddle.x + ball.x;
             var dy = (-paddle.y + ball.y)/2;
             var root = Math.sqrt(Math.pow(dx,2)+Math.pow(dy,2));
@@ -199,8 +216,8 @@ module BoilerPlate {
             dy /= root;
 
             ball.body.velocity.setTo(
-                dx*b.ball_velocity,
-                dy*b.ball_velocity
+                dx*ball.ball_velocity,
+                dy*ball.ball_velocity
             )
         }
 

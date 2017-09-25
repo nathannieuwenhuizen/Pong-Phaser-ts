@@ -3,7 +3,7 @@ class Ball extends Phaser.Graphics{
     public ball_launched: boolean = false;
     constructor(x: number, y: number, game: Fabrique.IGame){
         super(game,x,y)
-        this.beginFill(0x00FFFF);
+        this.beginFill(0xFFFFFF);
         this.drawCircle(0,0,20);
         game.physics.arcade.enable(this);
 

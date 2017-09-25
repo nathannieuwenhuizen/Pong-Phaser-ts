@@ -56,25 +56,20 @@ class PauseMenu{
             , 400, 100);
         this.label.anchor.set(0.5);
 
-
+        this.graphics.addChild(this.testGrBtn);
+        this.graphics.addChild(this.testGrBtn2);
+        this.graphics.addChild(this.label);
         this.ToggleShow();
     }
     public ToggleShow():void{
-        if(this.label.visible == false)
+        if(this.graphics.visible == false)
         {
-            this.label.visible = true;
-            this.testGrBtn.visible = true;
-            this.testGrBtn2.visible = true;
             this.graphics.visible = true;
 
             this.gamePlay.ball.body.moves = this.gamePlay.paddle2.body.moves  = false;
 
             this.gamePlay.in_pause = true;
-        }
-        else{
-            this.label.visible = false;
-            this.testGrBtn.visible = false;
-            this.testGrBtn2.visible = false;
+        } else {
             this.graphics.visible = false;
 
             this.gamePlay.ball.body.moves = this.gamePlay.paddle2.body.moves  = true;
