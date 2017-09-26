@@ -36,7 +36,7 @@ class PauseMenu{
 
         this.graphics.drawRect(this.x - 150 - 50, this.y - 100 - 50, 400, 360 );
         this.testGrBtn = new LabeledButton(game, this.x, this.y, text_top, {
-            font: '25px Pong',
+            font: '23px Pong',
             fill: '#fff',
             align: 'center'
         }, callBack_top, this, 300, 100);
@@ -65,15 +65,11 @@ class PauseMenu{
         if(this.graphics.visible == false)
         {
             this.graphics.visible = true;
-
             this.gamePlay.ball.body.moves = this.gamePlay.paddle2.body.moves  = false;
-
             this.gamePlay.in_pause = true;
         } else {
             this.graphics.visible = false;
-
             this.gamePlay.ball.body.moves = this.gamePlay.paddle2.body.moves  = true;
-
             this.gamePlay.in_pause = false;
         }
     }

@@ -2,8 +2,10 @@ class Main_Menu{
     public graphics: Phaser.Graphics;
     public game: Fabrique.IGame;
     public testGrBtn: LabeledButton;
+    public mode_button: LabeledButton;
     public label: Label;
     public gameplay: Gameplay;
+    public player_count: number = 1;
     constructor(x:number, y:number, game: Fabrique.IGame, gameplay: Gameplay){
         this.game = game;
         this.gameplay = gameplay;
@@ -13,13 +15,19 @@ class Main_Menu{
         this.graphics.beginFill(0x000);
         this.graphics.drawRect(0,0, game.width, game.height );
 
-        var callback = this.play;
         this.testGrBtn = new LabeledButton(game, x, y, 'Play', {
-            font: '63px Pong',
+            font: '60px Pong',
             fill: '#fff',
             align: 'center'
-        }, callback, this, 300, 100);
+        }, this.play, this, 300, 100);
         this.testGrBtn.createTexture(0x1a1a1a);
+
+        this.mode_button = new LabeledButton(game, x, y+150, '1 player', {
+            font: '25px Pong',
+            fill: '#fff',
+            align: 'center'
+        }, this.switch_player_count, this, 300, 100);
+        this.mode_button.createTexture(0x1a1a1a);
 
         this.label = new Label( game, x, y - 200, 'PONG', {
                 font: '100px Pong',
@@ -29,7 +37,10 @@ class Main_Menu{
         this.label.anchor.set(0.5);
 
         this.graphics.addChild(this.testGrBtn);
+        this.graphics.addChild(this.mode_button);
         this.graphics.addChild(this.label);
+
+
     }
     public play(): void{
         this.gameplay.restart();
@@ -38,5 +49,17 @@ class Main_Menu{
     }
     public back_to_menu():void{
         this.graphics.visible = true;
+    }
+    public switch_player_count():void{
+        switch (this.player_count){
+            case 1:
+                this.mode_button.setText('2 players');
+                this.player_count = 2;
+                break;
+            case 2:
+                this.mode_button.setText('1 player');
+                this.player_count = 1;
+                break;
+        }
     }
 }

@@ -228,6 +228,12 @@ module BoilerPlate {
                     Fabrique.Branding.preloadImages(this.game);
                 }
             });
+
+
+            Fabrique.LoaderHelper.hide();
+            this.game.state.start(Menu.Name);
+            this.game.ads.onContentPaused.removeAll();
+            this.game.ads.onContentResumed.removeAll();
         }
 
         /**
