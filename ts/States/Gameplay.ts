@@ -10,26 +10,32 @@ module BoilerPlate {
         public static pause: boolean = false;
         public name: string = Gameplay.Name;
         public game: Fabrique.IGame;
+
+
         public menu: Main_Menu;
+
         public in_pause:boolean;
         public in_game: boolean;
+
         private score1: number = 0;
         private score2: number = 0;
         private score_text: Phaser.Text;
         private click_to_start_text: Phaser.Text;
-        private  timer: number = 0;
         public ball: Ball;
         private paddle1:PlayerPaddle;
         public paddle2: any;
-        public loop: any;
         private filter: Void_Filter;
         private sprite: Phaser.Sprite;
         private pauseMenu: PauseMenu;
-        public pauseBtn: Phaser.Button;
-        public bg: Phaser.Graphics;
+        private resultMenu;
+        private pauseBtn: Phaser.Button;
+        private bg: Phaser.Graphics;
         private bg_color: any;
         public game_layer: any;
         public after_images: AfterImage;
+        public end_score: number = 5;
+        private controls_sprite1: Phaser.Sprite;
+        private controls_sprite2: Phaser.Sprite;
         constructor() {
             super();
         }
@@ -47,38 +53,68 @@ module BoilerPlate {
 
 
 
+            //background
             this.bg = this.game.add.graphics( 0, 0 );
             this.bg.beginFill(0xFFFFFF, 1);
             this.bg.boundsPadding = 0;
             this.bg.drawRect(0, 0, this.game.width, this.game.height);
             this.bg.tint = 0x000000;
 
-            this.in_game = true;
+            //make paddlas, ball and effects.
             this.ball = new Ball( this.game.world.centerX, this.game.world.centerY, this.game)
             this.paddle1 = new PlayerPaddle(this.game, 50, this.game.world.height / 2, Phaser.Keyboard.W, Phaser.Keyboard.S);
             this.paddle2 = new ComputerPaddle(this.game, this.game.world.width - 50, this.game.world.height / 2, this.ball);
+            this.after_images =  new AfterImage(15, this.game);
+
+
+            //draw play field
+            let graphics= this.game.add.graphics(0,0);
+            graphics.lineStyle(4, 0xffffff, 0.5);
+            graphics.moveTo(this.game.width/2, 0);
+            graphics.lineTo(this.game.width/2, this.game.height);
+            graphics.lineStyle(20, 0xffffff, 1);
+            graphics.moveTo(0, 0);
+            graphics.lineTo(this.game.width, 0);
+            graphics.lineTo(this.game.width, this.game.height);
+            graphics.lineTo(0, this.game.height);
+            graphics.lineTo(0, 0);
+            graphics.endFill();
 
             this.game_layer = this.add.group();
 
             this.game_layer.add(this.paddle2);
             this.game_layer.add(this.paddle1);
             this.game_layer.addChild(this.ball);
+            //this.game_layer.addChild(this.after_images);
 
-            this.game.input.onDown.add(this.launch_ball,this);
+            this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR).onDown.add(this.launch_ball, this);
 
-            this.score1 = this.score2 = this.timer = 0;
-            this.score_text = new Label(this.game, this.game.world.width/2,60, '0 - 0',{
+            this.controls_sprite1 = this.game.add.sprite(80,this.game.height/2,Images.Controls_1);
+            this.controls_sprite1.anchor.set(.5);
+            this.controls_sprite1.scale.set(.2);
+
+            this.controls_sprite2 = this.game.add.sprite(this.game.width -80,this.game.height/2,Images.Controls_2);
+            this.controls_sprite2.anchor.set(.5);
+            this.controls_sprite2.scale.set(.2);
+            this.controls_sprite1.alpha =this.controls_sprite2.alpha = 0;
+
+
+                this.score1 = this.score2 = 0;
+            this.score_text = new Label(this.game, this.game.world.width/2,60, '0   0',{
                     font: '64px Pong',
                     fill:'#fff',
                     align: 'center'}
                 , 400, 100);
             this.score_text.anchor.set(0.5);
+
             this.click_to_start_text = this.game.add.text(this.game.world.centerX, this.game.world.centerY-60,'',{
                 font: '15px Pong',
                     fill:'#fff',
                     align: 'center'
             });
             this.click_to_start_text.anchor.set(0.5);
+
+            this.resultMenu = new PauseMenu(this.game.width/2, this.game.height/2, this.game,  '', "Retry", "Back to menu",this, false);
             this.pauseMenu = new PauseMenu(this.game.width/2, this.game.height/2, this.game, "pause", "Resume", "Back to menu",this, true);
             this.pauseBtn = this.game.add.button(80, 50, Images.Pause, this.pauseMenu.ToggleShow , this.pauseMenu, 2, 1, 0);
 
@@ -97,7 +133,7 @@ module BoilerPlate {
 
             SoundManager.getInstance().play(Sounds.menu_music,0,true);
 
-            this.after_images =  new AfterImage(15, this.game);
+            //this.game.camera.fade(0x000000, 4000);
             this.render_after_images();
         }
 
@@ -115,11 +151,21 @@ module BoilerPlate {
 
         }
         public launch_ball(): void{
+
             if(this.in_game)
             {
                 this.ball.launch();
                 this.click_to_start_text.text = '';
+
+                this.removeControlSprite(this.controls_sprite1);
+                this.removeControlSprite(this.controls_sprite2);
+
+
             }
+        }
+        public removeControlSprite(sprite:Phaser.Sprite):void{
+            this.game.tweens.removeFrom(sprite);
+            this.game.add.tween(sprite).to( { alpha: 0 }, 200, Phaser.Easing.Linear.None, true, 0);
         }
 
         public async render_after_images():void{
@@ -167,21 +213,23 @@ module BoilerPlate {
                 })(this));
             if(this.ball.body.blocked.left){
 
+                this.after_images.help2(this.ball.x,this.ball.y,30,1, 0xFF0000);
                 this.someone_scored(false);
             }
             else if (this.ball.body.blocked.right){
-
+                this.after_images.help2(this.ball.x,this.ball.y,30,1, 0xFF0000);
                 this.someone_scored(true);
             }
         }
         public someone_scored(you_scored:boolean):void{
             this.game.camera.shake(.01,100);
 
+            this.game.add.tween(this.score_text).to( { alpha: 0 }, 200, Phaser.Easing.Linear.None, true, 0, 0, true);
             this.ball.reset_ball(this.game);
-            this.paddle2.y = this.paddle1.y =  this.game.world.height/2;
+            this.paddle2.y  =  this.game.world.height/2;
             if(you_scored){
                 this.score1++;
-                if(this.score1 == 5)
+                if(this.score1 == this.end_score)
                 {
                     if(this.menu.player_count == 2)
                     {
@@ -196,7 +244,7 @@ module BoilerPlate {
             }
             else{
                 this.score2++;
-                if(this.score2 == 5)
+                if(this.score2 == this.end_score)
                 {
                     if(this.menu.player_count == 2)
                     {
@@ -209,50 +257,70 @@ module BoilerPlate {
                     this.UI_Flicker();
                 }
             }
-            this.score_text.text = this.score1 +' - '+ this.score2;
+            this.score_text.text = this.score1 +'   '+ this.score2;
 
         }
         public game_ends(result: string):void{
             this.in_game = false;
-            clearInterval(this.loop);
             this.click_to_start_text.text = '';
             this.pauseBtn.visible = false;
-            this.pauseMenu = new PauseMenu(this.game.width/2, this.game.height/2, this.game,  result, "Retry", "Back to menu",this, false);
-            this.pauseMenu.ToggleShow();
+            this.resultMenu.label.text = result;
+            this.resultMenu.ToggleShow();
 
         }
 
         public restart():void{
             SoundManager.getInstance().stop(Sounds.menu_music);
+            SoundManager.getInstance().play(Sounds.in_game_music, 0,true);
+
             this.bg.tint = 0x000000;
+
             this.score1 = this.score2 = 0;
-            this.score_text.text = this.score1 +' - '+ this.score2;
+            this.score_text.text = this.score1 +'   '+ this.score2;
+
             this.pauseBtn.visible = true;
             this.UI_Flicker();
             this.in_game = true;
+            this.in_pause = false;
+
             this.paddle2.destroy();
-            if(this.menu.player_count ==2){
+            if(this.menu.player_count == 2){
                 this.paddle2 = new PlayerPaddle(this.game, this.game.world.width - 50, this.game.world.height / 2, Phaser.Keyboard.UP, Phaser.Keyboard.DOWN);
-                console.log("player");
+                this.game.add.tween(this.controls_sprite2).to( { alpha: .5 }, 400, Phaser.Easing.Linear.None, true, 0, 600, true).loop(true);
             }
             else{
                 this.paddle2 = new ComputerPaddle(this.game, this.game.world.width - 50, this.game.world.height / 2, this.ball);
-                console.log("ai");
             }
+            this.paddle1.reset();
             this.game.add.existing(this.paddle2);
             this.game_layer.add(this.paddle2);
 
-            //this.ball.reset_ball();
 
             this.ball.x = this.game.world.centerX;
             this.ball.y = this.game.world.centerY;
-            this.pauseMenu = new PauseMenu(this.game.width/2, this.game.height/2, this.game, "pause", "Resume", "Back to menu",this, true);
-            SoundManager.getInstance().play(Sounds.in_game_music, 0,true);
+
+            this.game.add.tween(this.controls_sprite1).to( { alpha: .5 }, 400, Phaser.Easing.Linear.None, true, 0, 600, true).loop(true);
+
+            this.controls_show();
 
         }
 
+        private async controls_show():void{
+            await this.delay(100);
+            if(this.paddle1.y != this.game.world.height / 2){
+                this.removeControlSprite(this.controls_sprite1);
+            }
+            if(this.paddle2.y != this.game.world.height / 2){
+                this.removeControlSprite(this.controls_sprite2);
+
+            }
+            if(this.paddle1.y == this.game.world.height / 2 || (this.paddle2.y == this.game.world.height / 2 && this.menu.player_count == 2)){
+                this.controls_show();
+            }
+        }
+
         private componentToHex(c:number): void {
-            var hex = c.toString(16);
+            let hex = c.toString(16);
             return hex.length == 1 ? "0" + hex : hex;
         }
 
@@ -264,12 +332,14 @@ module BoilerPlate {
         //gives the ball an angle of direction based on where the ball is hitted
         public redirect_ball(paddle:Paddle,ball:Ball): void{
             this.game.camera.shake(.0025,100);
+            this.paddle1.accelerate();
+            this.paddle2.accelerate();
 
             this.after_images.help2(ball.x, ball.y);
             this.bg.tint = this.rgbToHex(Math.round(Math.random()*100),Math.round(Math.random()*100),Math.round(Math.random()*100));
-            var dx = -paddle.x + ball.x;
-            var dy = (-paddle.y + ball.y)/2;
-            var root = Math.sqrt(Math.pow(dx,2)+Math.pow(dy,2));
+            let dx = -paddle.x + ball.x;
+            let dy = (-paddle.y + ball.y)/2;
+            let root = Math.sqrt(Math.pow(dx,2)+Math.pow(dy,2));
             dx /= root;
             dy /= root;
             ball.accelerate();
@@ -280,7 +350,9 @@ module BoilerPlate {
         }
 
         public UI_Flicker():void{
-            this.click_to_start_text.text = 'Left click to start!';
+            this.click_to_start_text.text = 'press spacebar to start!';
+            this.click_to_start_text.alpha = 0.1;
+            this.game.add.tween(this.click_to_start_text).to( { alpha: 1 }, 200, Phaser.Easing.Linear.None, true, 0, 600, true).loop(true);
         }
     }
 }

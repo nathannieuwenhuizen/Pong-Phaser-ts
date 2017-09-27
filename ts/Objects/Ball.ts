@@ -27,18 +27,6 @@ class Ball extends Phaser.Graphics{
             {x: 60, y: 0}
         ];
 
-        /*this.last_position = {x:this.x, y:this.y};
-        this.after_images = new Array(3);
-        for(let i: number = 0; i < 3; i++)
-        {
-            this.after_images[i] = game.add.graphics(this.list_pf_positions[i].x,this.list_pf_positions[i].y);
-            this.after_images[i].beginFill(0xFFFFFF);
-            this.after_images[i].fillAlpha = 0.5;
-            this.after_images[i].drawCircle(0,0,20);
-            //this.after_images.push(graph);
-            this.addChild(this.after_images[i]);
-        }*/
-
     }
     public launch(){
         if(!this.ball_launched)

@@ -8,12 +8,16 @@ class Images {
     public static Ball: string = 'ball'
     public static Pause: string = 'pause'
     public static Close: string = 'close'
+    public static Controls_1: string = 'controls2'
+    public static Controls_2: string = 'controls'
     public static preloadList: string[] = [
         //Add images for the preloader
         Images.Paddle,
         Images.Ball,
         Images.Pause,
         Images.Close,
+        Images.Controls_1,
+        Images.Controls_2
     ];
 
     /**

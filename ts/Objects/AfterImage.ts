@@ -1,8 +1,8 @@
 class AfterImage {
     public after_images: Phaser.Graphics[];
     public bounce_images: Phaser.Graphics[];
-    public index:number = 0;
-    public index2:number = 0;
+    public index:number = 1;
+    public index2:number = 1;
     constructor(amount:number, game: Fabrique.IGame){
 
         this.after_images = new Array(Phaser.Graphics);
@@ -48,11 +48,12 @@ class AfterImage {
             this.index++;
         }
     }
-    public help2(x:number,y:number): void{
+    public help2(x:number,y:number, width:number = 30, alpha:number = 0.7, tint: any = 0xFFFFFF): void{
         this.bounce_images[this.index2].x = x;
         this.bounce_images[this.index2].y = y;
-        this.bounce_images[this.index2].alpha = .7;
-        this.bounce_images[this.index2].height = this.bounce_images[this.index2].width = 30;
+        this.bounce_images[this.index2].alpha = alpha;
+        this.bounce_images[this.index2].tint = tint;
+        this.bounce_images[this.index2].height = this.bounce_images[this.index2].width = width;
         if (this.index2 >= this.bounce_images.length-1) {
             this.index2 = 1;
         } else {

@@ -41,6 +41,7 @@ module BoilerPlate {
             //This button is made by generating the texture with graphics
             this.testGrBtn = new LabeledButton(this.game, 0, 0, 'PLAY', textStyle, this.startGame, this, 300, 100);
             this.testGrBtn.createTexture(0xf98f25);
+
             this.startGame();
             this.resize();
         }

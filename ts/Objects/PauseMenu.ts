@@ -1,12 +1,13 @@
 import LabeledButton = BoilerPlate.LabeledButton;
 import Gameplay = BoilerPlate.Gameplay;
+import Tween = Phaser.Tween;
 
 class PauseMenu{
-    public  testGrBtn: LabeledButton;
-    public  testGrBtn2: LabeledButton;
+    public testGrBtn: LabeledButton;
+    public testGrBtn2: LabeledButton;
     public graphics: Phaser.Graphics;
-    public  gamePlay: Gameplay;
-    private label: Label;
+    public gamePlay: Gameplay;
+    public label: Label;
     public game: Fabrique.IGame;
     public x: number;
     public y: number;
@@ -36,11 +37,14 @@ class PauseMenu{
 
         this.graphics.drawRect(this.x - 150 - 50, this.y - 100 - 50, 400, 360 );
         this.testGrBtn = new LabeledButton(game, this.x, this.y, text_top, {
-            font: '23px Pong',
+            font: '25px Pong',
             fill: '#fff',
             align: 'center'
         }, callBack_top, this, 300, 100);
         this.testGrBtn.createTexture(0x1a1a1a);
+        this.testGrBtn.events.onInputOver.add(this.button_hover, this.testGrBtn);
+        this.testGrBtn.events.onInputOut.add(this.button_unhover, this.testGrBtn);
+
 
         this.testGrBtn2 = new LabeledButton(game, this.x, this.y+ 110, text_bottom, {
             font: '25px Pong',
@@ -48,6 +52,8 @@ class PauseMenu{
             align: 'center'
         }, callback_bottom, this, 300, 100);
         this.testGrBtn2.createTexture(0x1a1a1a);
+        this.testGrBtn2.events.onInputOver.add(this.button_hover, this.testGrBtn);
+        this.testGrBtn2.events.onInputOut.add(this.button_unhover, this.testGrBtn);
 
         this.label = new Label( game, this.x, this.y-100, title,{
             font: '33px Pong',
@@ -62,7 +68,9 @@ class PauseMenu{
         this.ToggleShow();
     }
     public ToggleShow():void{
-        if(this.graphics.visible == false)
+        this.button_unhover(this.testGrBtn);
+        this.button_unhover(this.testGrBtn2);
+        if (!this.graphics.visible)
         {
             this.graphics.visible = true;
             this.gamePlay.ball.body.moves = this.gamePlay.paddle2.body.moves  = false;
@@ -73,11 +81,22 @@ class PauseMenu{
             this.gamePlay.in_pause = false;
         }
     }
+    public button_hover(button: LabeledButton):void
+    {
+        this.game.add.tween(button).to( { alpha: .5 }, 400, Phaser.Easing.Linear.None, true, 0, 600, true).loop(true);
+    }
+    public button_unhover(button: LabeledButton):void
+    {
+        this.game.tweens.removeFrom(button);
+        button.alpha = 1;
+    }
     public restart():void{
+        this.button_unhover(this.testGrBtn)
         this.ToggleShow();
         this.gamePlay.restart();
     }
     public back_to_menu(){
+        this.button_unhover(this.testGrBtn2)
         this.ToggleShow();
         this.gamePlay.back_to_menu();
     }
