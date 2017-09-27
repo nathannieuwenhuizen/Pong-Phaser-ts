@@ -27,7 +27,7 @@ module BoilerPlate {
         private filter: Void_Filter;
         private sprite: Phaser.Sprite;
         private pauseMenu: PauseMenu;
-        private resultMenu;
+        private resultMenu: PauseMenu;
         private pauseBtn: Phaser.Button;
         private bg: Phaser.Graphics;
         private bg_color: any;
@@ -64,7 +64,7 @@ module BoilerPlate {
             this.ball = new Ball( this.game.world.centerX, this.game.world.centerY, this.game)
             this.paddle1 = new PlayerPaddle(this.game, 50, this.game.world.height / 2, Phaser.Keyboard.W, Phaser.Keyboard.S);
             this.paddle2 = new ComputerPaddle(this.game, this.game.world.width - 50, this.game.world.height / 2, this.ball);
-            this.after_images =  new AfterImage(15, this.game);
+            this.after_images =  new AfterImage(30, this.game);
 
 
             //draw play field
@@ -168,16 +168,16 @@ module BoilerPlate {
             this.game.add.tween(sprite).to( { alpha: 0 }, 200, Phaser.Easing.Linear.None, true, 0);
         }
 
-        public async render_after_images():void{
+        public async render_after_images():Promise<string>{
             await this.delay(50);
             if(!this.in_pause && this.ball.ball_launched){
                 this.after_images.help(this.ball.x,this.ball.y);
-
             }
             this.render_after_images();
+            return null;
 
         }
-        public delay(ms: number): void {
+        public delay(ms: number): Promise<string> {
             return new Promise(resolve => setTimeout(resolve, ms));
         }
         public update(): void {
@@ -226,6 +226,8 @@ module BoilerPlate {
 
             this.game.add.tween(this.score_text).to( { alpha: 0 }, 200, Phaser.Easing.Linear.None, true, 0, 0, true);
             this.ball.reset_ball(this.game);
+            this.paddle1.reset_speed();
+            this.paddle2.reset_speed();
             this.paddle2.y  =  this.game.world.height/2;
             if(you_scored){
                 this.score1++;
@@ -291,7 +293,7 @@ module BoilerPlate {
             else{
                 this.paddle2 = new ComputerPaddle(this.game, this.game.world.width - 50, this.game.world.height / 2, this.ball);
             }
-            this.paddle1.reset();
+            this.paddle1.reset_speed();
             this.game.add.existing(this.paddle2);
             this.game_layer.add(this.paddle2);
 
@@ -305,7 +307,7 @@ module BoilerPlate {
 
         }
 
-        private async controls_show():void{
+        private async controls_show(): Promise<string>{
             await this.delay(100);
             if(this.paddle1.y != this.game.world.height / 2){
                 this.removeControlSprite(this.controls_sprite1);
@@ -317,28 +319,30 @@ module BoilerPlate {
             if(this.paddle1.y == this.game.world.height / 2 || (this.paddle2.y == this.game.world.height / 2 && this.menu.player_count == 2)){
                 this.controls_show();
             }
+            return null;
         }
 
-        private componentToHex(c:number): void {
+        private componentToHex(c:number): string {
             let hex = c.toString(16);
             return hex.length == 1 ? "0" + hex : hex;
         }
 
-        private rgbToHex(r:number, g:number, b:number):void {
-            return "0x" + this.componentToHex(r) + this.componentToHex(g) + this.componentToHex(b);
+
+        private rgbToHex(r:number, g:number, b:number):number {
+            return parseInt("0x" + this.componentToHex(r) + this.componentToHex(g) + this.componentToHex(b));
         }
 
 
         //gives the ball an angle of direction based on where the ball is hitted
         public redirect_ball(paddle:Paddle,ball:Ball): void{
-            this.game.camera.shake(.0025,100);
+            this.game.camera.shake(.0025 ,100);
             this.paddle1.accelerate();
             this.paddle2.accelerate();
 
             this.after_images.help2(ball.x, ball.y);
             this.bg.tint = this.rgbToHex(Math.round(Math.random()*100),Math.round(Math.random()*100),Math.round(Math.random()*100));
             let dx = -paddle.x + ball.x;
-            let dy = (-paddle.y + ball.y)/2;
+            let dy = (-paddle.y + /*paddle.body.velocity.y/20 +*/ ball.y)/2;
             let root = Math.sqrt(Math.pow(dx,2)+Math.pow(dy,2));
             dx /= root;
             dy /= root;

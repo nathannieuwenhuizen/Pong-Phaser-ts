@@ -1,12 +1,13 @@
 class AfterImage {
-    public after_images: Phaser.Graphics[];
-    public bounce_images: Phaser.Graphics[];
+    public after_images: any;
+    public bounce_images: any;
     public index:number = 1;
     public index2:number = 1;
     constructor(amount:number, game: Fabrique.IGame){
 
         this.after_images = new Array(Phaser.Graphics);
         this.bounce_images = new Array(Phaser.Graphics);
+        console.log(typeof this.after_images);
         for(let i: number = 0; i < amount; i++) {
             let temp: Phaser.Graphics = game.add.graphics(0,0);
 
@@ -26,13 +27,13 @@ class AfterImage {
     }
     public lower_alpha_after_images():void {
         for (let i: number = 0; i < this.after_images.length; i++) {
-            this.after_images[i].alpha -= 0.02;
+            this.after_images[i].alpha -= 0.01;
             this.after_images[i].width -= 0.2;
             this.after_images[i].height -= 0.2;
         }
         for (let i: number = 0; i < this.bounce_images.length; i++) {
             this.bounce_images[i].alpha -= 0.02;
-            this.bounce_images[i].width +=2;
+            this.bounce_images[i].width += 2;
             this.bounce_images[i].height += 2;
         }
     }

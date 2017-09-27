@@ -4,9 +4,6 @@ class Ball extends Phaser.Graphics{
     public min_velocity: number = 500;
     public max_velocity: number = 800;
 
-    private after_images: Array;
-    public list_pf_positions: Array;
-    private last_position;
 
     constructor(x: number, y: number, game: Fabrique.IGame){
         super(game,x,y)
@@ -21,11 +18,6 @@ class Ball extends Phaser.Graphics{
         this.body.bounce.setTo(1, 1);
         this.scale.set(1,1);
         this.body.velocity.x = 0;
-        this.list_pf_positions = [
-            {x: 20, y: 0},
-            {x: 40, y: 0},
-            {x: 60, y: 0}
-        ];
 
     }
     public launch(){
@@ -34,23 +26,6 @@ class Ball extends Phaser.Graphics{
             this.ball_launched = true;
             this.body.velocity.x = -this.ball_velocity;
             //this.ball.body.velocity.y = -this.ball_velocity;
-
-        }
-    }
-    public calculate_after_image():void{
-
-
-        this.list_pf_positions.push({
-            x: -this.body.velocity.x/20,
-            y: -this.body.velocity.y/20
-
-        });
-        this.last_position = {x:this.x, y:this.y};
-        this.list_pf_positions.splice(0,1);
-        for(let i: number = 0; i < this.after_images.length; i++)
-        {
-            this.after_images[i].x = this.list_pf_positions[i].x;
-            this.after_images[i].y = this.list_pf_positions[i].y;
         }
     }
     public reset_ball(game: Fabrique.IGame) {
