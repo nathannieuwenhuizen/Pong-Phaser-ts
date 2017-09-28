@@ -89,11 +89,11 @@ module BoilerPlate {
 
             this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR).onDown.add(this.launch_ball, this);
 
-            this.controls_sprite1 = this.game.add.sprite(80,this.game.height/2,Images.Controls_1);
+            this.controls_sprite1 = this.game.add.sprite(100,this.game.height/2,Images.Controls_1);
             this.controls_sprite1.anchor.set(.5);
             this.controls_sprite1.scale.set(.2);
 
-            this.controls_sprite2 = this.game.add.sprite(this.game.width -80,this.game.height/2,Images.Controls_2);
+            this.controls_sprite2 = this.game.add.sprite(this.game.width -100,this.game.height/2,Images.Controls_2);
             this.controls_sprite2.anchor.set(.5);
             this.controls_sprite2.scale.set(.2);
             this.controls_sprite1.alpha =this.controls_sprite2.alpha = 0;
@@ -319,6 +319,9 @@ module BoilerPlate {
             if(this.paddle1.y == this.game.world.height / 2 || (this.paddle2.y == this.game.world.height / 2 && this.menu.player_count == 2)){
                 this.controls_show();
             }
+
+
+
             return null;
         }
 
