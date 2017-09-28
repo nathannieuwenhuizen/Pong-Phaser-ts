@@ -10,6 +10,8 @@ class Images {
     public static Close: string = 'close';
     public static Controls_1: string = 'controls2';
     public static Controls_2: string = 'controls';
+    public static Sound_On: string = 'sound_on';
+    public static Sound_Off: string = 'sound_off';
     public static preloadList: string[] = [
         //Add images for the preloader
         Images.Paddle,
@@ -17,7 +19,9 @@ class Images {
         Images.Pause,
         Images.Close,
         Images.Controls_1,
-        Images.Controls_2
+        Images.Controls_2,
+        Images.Sound_On,
+        Images.Sound_Off,
     ];
 
     /**

@@ -1,7 +1,5 @@
 module BoilerPlate {
-    import game = PIXI.game;
-    import Group = Phaser.Group;
-    import Sound = Phaser.Sound;
+
 
     export class Gameplay extends Phaser.State implements Fabrique.IState {
         public static Name: string = 'gameplay';
@@ -111,7 +109,7 @@ module BoilerPlate {
 
             this.resultMenu = new PauseMenu(this.game.width / 2, this.game.height / 2, this.game, '', 'Retry', 'Back to menu', this, false);
             this.pauseMenu = new PauseMenu(this.game.width / 2, this.game.height / 2, this.game, 'pause', 'Resume', 'Back to menu', this, true);
-            this.pauseBtn = this.game.add.button(80, 50, Images.Pause, this.pauseMenu.ToggleShow, this.pauseMenu, 2, 1, 0);
+            this.pauseBtn = this.game.add.button(80, 50, Images.Pause, this.pause_button_clicked.bind(this), this.pauseMenu, 2, 1, 0);
 
             this.in_game = false;
             this.menu = new Main_Menu(this.game.width / 2, this.game.height / 2, this.game, this);
@@ -123,15 +121,19 @@ module BoilerPlate {
             this.sprite.alpha = 0.1;
             this.sprite.filters = [this.filter.filter_effect];
 
-            SoundManager.getInstance().play(Sounds.menu_music, 0, true);
+            SoundManager.getInstance().play(Sounds.menu_music, Sounds.volume * 0.5, true);
 
             //this.game.camera.fade(0x000000, 4000);
             this.render_after_images();
         }
 
+        public pause_button_clicked(): void {
+            SoundManager.getInstance().play(Sounds.button_click, Sounds.volume * 0.5);
+            this.pauseMenu.ToggleShow();
+        }
+
         public back_to_menu(): void {
-            SoundManager.getInstance().play(Sounds.Biep);
-            SoundManager.getInstance().play(Sounds.menu_music, 0, true);
+            SoundManager.getInstance().play(Sounds.menu_music, Sounds.volume * 0.5, true);
             SoundManager.getInstance().stop(Sounds.in_game_music);
 
             this.in_game = false;
@@ -146,9 +148,9 @@ module BoilerPlate {
         public launch_ball(): void {
 
             if (this.in_game) {
+                SoundManager.getInstance().play(Sounds.launch, Sounds.volume);
                 this.ball.launch();
                 this.click_to_start_text.text = '';
-
                 this.removeControlSprite(this.controls_sprite1);
                 this.removeControlSprite(this.controls_sprite2);
             }
@@ -190,19 +192,11 @@ module BoilerPlate {
         public collission_detection(): void {
 
             this.game.physics.arcade.collide(this.paddle1, this.ball,
-                (function (scope) {
-                    return function (): void {
-                        SoundManager.getInstance().play(Sounds.Biep2);
-                        scope.redirect_ball(scope.paddle1, scope.ball);
-                    };
-                })(this));
+                () => this.redirect_ball(this.paddle1, this.ball)
+            );
             this.game.physics.arcade.collide(this.paddle2, this.ball,
-                (function (scope) {
-                    return function (): void {
-                        SoundManager.getInstance().play(Sounds.Biep2);
-                        scope.redirect_ball(scope.paddle2, scope.ball);
-                    };
-                })(this));
+                () => this.redirect_ball(this.paddle2, this.ball)
+            );
 
             if (this.ball.body.blocked.left) {
 
@@ -212,15 +206,14 @@ module BoilerPlate {
                 this.after_images.help2(this.ball.x, this.ball.y, 30, 1, 0xFF0000);
                 this.someone_scored(true);
             }
-            console.log('please!');
-            if ( this.ball.body.blocked.up || this.ball.body.blocked.down) {
-                console.log('yay!');
-                SoundManager.getInstance().play(Sounds.Biep);
+            if (this.ball.body.blocked.up || this.ball.body.blocked.down) {
+                SoundManager.getInstance().play(Sounds.Biep, Sounds.volume * 0.5);
             }
         }
 
         public someone_scored(you_scored: boolean): void {
             this.game.camera.shake(.01, 100);
+            SoundManager.getInstance().play(Sounds.ball_destroyed, Sounds.volume * 0.5);
 
             this.game.add.tween(this.score_text).to({alpha: 0}, 200, Phaser.Easing.Linear.None, true, 0, 0, true);
             this.ball.reset_ball(this.game);
@@ -230,6 +223,7 @@ module BoilerPlate {
             if (you_scored) {
                 this.score1++;
                 if (this.score1 === this.end_score) {
+                    SoundManager.getInstance().play(Sounds.win, Sounds.volume);
                     if (this.menu.player_count === 2) {
                         this.game_ends('Player 1 wins!');
                     } else {
@@ -242,8 +236,10 @@ module BoilerPlate {
                 this.score2++;
                 if (this.score2 === this.end_score) {
                     if (this.menu.player_count === 2) {
+                        SoundManager.getInstance().play(Sounds.win, Sounds.volume);
                         this.game_ends('Player 2 wins!');
                     } else {
+                        SoundManager.getInstance().play(Sounds.lose, Sounds.volume);
                         this.game_ends('You have lost');
                     }
                 } else {
@@ -265,7 +261,7 @@ module BoilerPlate {
 
         public restart(): void {
             SoundManager.getInstance().stop(Sounds.menu_music);
-            SoundManager.getInstance().play(Sounds.in_game_music, 0, true);
+            SoundManager.getInstance().play(Sounds.in_game_music, Sounds.volume * 1, true);
 
             this.bg.tint = 0x000000;
 
@@ -299,6 +295,8 @@ module BoilerPlate {
 
         //gives the ball an angle of direction based on where the ball is hitted
         public redirect_ball(paddle: Paddle, ball: Ball): void {
+            SoundManager.getInstance().play(Sounds.Biep2, Sounds.volume);
+
             this.game.camera.shake(.0025, 100);
             this.paddle1.accelerate();
             this.paddle2.accelerate();

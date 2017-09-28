@@ -1,6 +1,7 @@
 import LabeledButton = BoilerPlate.LabeledButton;
 import Gameplay = BoilerPlate.Gameplay;
 import Label = BoilerPlate.Label;
+import SoundManager = BoilerPlate.SoundManager;
 
 class PauseMenu {
     public testGrBtn: LabeledButton;
@@ -9,7 +10,8 @@ class PauseMenu {
     public gamePlay: Gameplay;
     public label: Label;
     public game: Fabrique.IGame;
-    public x: number;Ð
+    public x: number;
+    Ð
     public y: number;
 
     constructor(_x: number, _y: number, game: Fabrique.IGame, title: string, text_top: string, text_bottom: string, gamePlay: Gameplay, resume_or_restart: boolean = false) {
@@ -29,7 +31,7 @@ class PauseMenu {
 
         var callBack_top;
         if (resume_or_restart) {
-            callBack_top = this.ToggleShow;
+            callBack_top = this.Resume;
         } else {
             callBack_top = this.restart;
         }
@@ -42,6 +44,7 @@ class PauseMenu {
             align: 'center'
         }, callBack_top, this, 300, 100);
         this.testGrBtn.createTexture(0x1a1a1a);
+
         this.testGrBtn.events.onInputOver.add(this.button_hover, this.testGrBtn);
         this.testGrBtn.events.onInputOut.add(this.button_unhover, this.testGrBtn);
 
@@ -68,7 +71,13 @@ class PauseMenu {
         this.ToggleShow();
     }
 
+    public Resume(): void {
+        SoundManager.getInstance().play(Sounds.button_click, Sounds.volume * 0.5);
+        this.ToggleShow();
+    }
+
     public ToggleShow(): void {
+
         this.button_unhover(this.testGrBtn);
         this.button_unhover(this.testGrBtn2);
         if (!this.graphics.visible) {
@@ -92,6 +101,8 @@ class PauseMenu {
     }
 
     public restart(): void {
+
+        SoundManager.getInstance().play(Sounds.button_click, Sounds.volume * 0.5);
         this.button_unhover(this.testGrBtn);
         this.ToggleShow();
         this.gamePlay.restart();
@@ -99,6 +110,7 @@ class PauseMenu {
     }
 
     public back_to_menu(): void {
+        SoundManager.getInstance().play(Sounds.button_click, Sounds.volume * 0.5);
         this.button_unhover(this.testGrBtn2);
         this.ToggleShow();
         this.gamePlay.back_to_menu();

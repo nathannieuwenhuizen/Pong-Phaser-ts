@@ -8,6 +8,7 @@ class Main_Menu {
     public label: Label;
     public gameplay: Gameplay;
     public player_count: number = 1;
+    private sound_image: Phaser.Sprite;
 
     constructor(x: number, y: number, game: Fabrique.IGame, gameplay: Gameplay) {
 
@@ -45,13 +46,21 @@ class Main_Menu {
             , 400, 100);
         this.label.anchor.set(0.5);
 
+        this.sound_image = game.add.sprite(game.width - 50, game.height - 50, Images.Sound_On);
+        this.sound_image.width = this.sound_image.height = 50;
+        this.sound_image.anchor.set(.5);
+        this.sound_image.inputEnabled = true;
+        this.sound_image.events.onInputDown.add(this.switch_sound, this);
+
         this.graphics.addChild(this.testGrBtn);
         this.graphics.addChild(this.mode_button);
         this.graphics.addChild(this.label);
+        this.graphics.addChild(this.sound_image);
 
     }
 
     public button_hover(button: LabeledButton): void {
+        //SoundManager.getInstance().play(Sounds.button_hover, Sounds.volume * 0.5);
         this.game.add.tween(button).to({alpha: .5}, 400, Phaser.Easing.Linear.None, true, 0, 600, true).loop(true);
     }
 
@@ -61,8 +70,11 @@ class Main_Menu {
     }
 
     public play(): void {
+        SoundManager.getInstance().play(Sounds.button_click, Sounds.volume * 0.5);
+
         this.testGrBtn.alpha = 1;
         this.game.tweens.removeFrom(this.testGrBtn);
+
 
         this.gameplay.restart();
         this.graphics.visible = false;
@@ -74,6 +86,8 @@ class Main_Menu {
     }
 
     public switch_player_count(): void {
+        SoundManager.getInstance().play(Sounds.button_click, Sounds.volume * 0.5);
+
         switch (this.player_count) {
             case 1:
                 this.mode_button.setText('2 players');
@@ -84,5 +98,19 @@ class Main_Menu {
                 this.player_count = 1;
                 break;
         }
+    }
+
+    public switch_sound(): void {
+        if (Sounds.volume === 1) {
+            Sounds.volume = 0;
+            this.sound_image.loadTexture(Images.Sound_Off);
+            SoundManager.getInstance().stop(Sounds.menu_music);
+        } else {
+            Sounds.volume = 1;
+            this.sound_image.loadTexture(Images.Sound_On);
+            SoundManager.getInstance().play(Sounds.menu_music, Sounds.volume * 0.5, true);
+
+        }
+        console.log(Sounds.volume);
     }
 }
