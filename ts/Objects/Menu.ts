@@ -1,3 +1,5 @@
+import Label = BoilerPlate.Label;
+
 class Main_Menu {
     public graphics: Phaser.Graphics;
     public game: Fabrique.IGame;

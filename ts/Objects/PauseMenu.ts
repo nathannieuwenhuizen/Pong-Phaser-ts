@@ -1,5 +1,6 @@
 import LabeledButton = BoilerPlate.LabeledButton;
 import Gameplay = BoilerPlate.Gameplay;
+import Label = BoilerPlate.Label;
 
 class PauseMenu {
     public testGrBtn: LabeledButton;
@@ -8,7 +9,7 @@ class PauseMenu {
     public gamePlay: Gameplay;
     public label: Label;
     public game: Fabrique.IGame;
-    public x: number;
+    public x: number;Ð
     public y: number;
 
     constructor(_x: number, _y: number, game: Fabrique.IGame, title: string, text_top: string, text_bottom: string, gamePlay: Gameplay, resume_or_restart: boolean = false) {

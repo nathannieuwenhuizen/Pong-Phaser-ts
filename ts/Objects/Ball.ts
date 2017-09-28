@@ -23,7 +23,13 @@ class Ball extends Phaser.Graphics {
     public launch(): void {
         if (!this.ball_launched) {
             this.ball_launched = true;
-            this.body.velocity.x = -this.ball_velocity;
+            let dx: number = (-0.5 + Math.random() * 1) * 10;
+            let dy: number = -0.5 + Math.random() * 1;
+            let root: number = Math.sqrt( Math.pow(dx, 2) + Math.pow(dy, 2) );
+            dx /= root;
+            dy /= root;
+            this.body.velocity.set( dx * this.ball_velocity, dy * this.ball_velocity);
+
             //this.ball.body.velocity.y = -this.ball_velocity;
         }
     }

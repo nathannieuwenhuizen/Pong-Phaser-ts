@@ -1,5 +1,3 @@
-import Label = BoilerPlate.Label;
-
 module BoilerPlate {
     import game = PIXI.game;
     import Group = Phaser.Group;
@@ -201,10 +199,11 @@ module BoilerPlate {
             this.game.physics.arcade.collide(this.paddle2, this.ball,
                 (function (scope) {
                     return function (): void {
-                        SoundManager.getInstance().play(Sounds.Biep);
+                        SoundManager.getInstance().play(Sounds.Biep2);
                         scope.redirect_ball(scope.paddle2, scope.ball);
                     };
                 })(this));
+
             if (this.ball.body.blocked.left) {
 
                 this.after_images.help2(this.ball.x, this.ball.y, 30, 1, 0xFF0000);
@@ -212,6 +211,11 @@ module BoilerPlate {
             } else if (this.ball.body.blocked.right) {
                 this.after_images.help2(this.ball.x, this.ball.y, 30, 1, 0xFF0000);
                 this.someone_scored(true);
+            }
+            console.log('please!');
+            if ( this.ball.body.blocked.up || this.ball.body.blocked.down) {
+                console.log('yay!');
+                SoundManager.getInstance().play(Sounds.Biep);
             }
         }
 
