@@ -5,45 +5,45 @@ module BoilerPlate {
     import Group = Phaser.Group;
     import Sound = Phaser.Sound;
 
-    export class Gameplay extends Phaser.State implements Fabrique.IState  {
+    export class Gameplay extends Phaser.State implements Fabrique.IState {
         public static Name: string = 'gameplay';
         public static pause: boolean = false;
         public name: string = Gameplay.Name;
         public game: Fabrique.IGame;
 
-
         public menu: Main_Menu;
 
-        public in_pause:boolean;
+        public in_pause: boolean;
         public in_game: boolean;
-
+        public end_score: number = 5;
+        public ball: Ball;
+        public after_images: AfterImage;
+        public paddle2: any;
+        public game_layer: any;
         private score1: number = 0;
         private score2: number = 0;
         private score_text: Phaser.Text;
         private click_to_start_text: Phaser.Text;
-        public ball: Ball;
-        private paddle1:PlayerPaddle;
-        public paddle2: any;
+        private paddle1: PlayerPaddle;
+        private bg: Phaser.Graphics;
         private filter: Void_Filter;
         private sprite: Phaser.Sprite;
         private pauseMenu: PauseMenu;
-        private resultMenu: PauseMenu;
         private pauseBtn: Phaser.Button;
-        private bg: Phaser.Graphics;
-        private bg_color: any;
-        public game_layer: any;
-        public after_images: AfterImage;
-        public end_score: number = 5;
+        private resultMenu: PauseMenu;
         private controls_sprite1: Phaser.Sprite;
         private controls_sprite2: Phaser.Sprite;
+
         constructor() {
             super();
         }
+
         public init(): void {
             this.game.world.removeAll();
             SoundManager.getInstance(this.game);
 
         }
+
         public create(): void {
             super.create();
 
@@ -51,27 +51,24 @@ module BoilerPlate {
             // this.game.analytics.google.sendScreenView(this.name);
             //this.background = this.game.add.image(0, 0, Atlases.Interface, 'bg_gameplay');
 
-
-
             //background
-            this.bg = this.game.add.graphics( 0, 0 );
+            this.bg = this.game.add.graphics(0, 0);
             this.bg.beginFill(0xFFFFFF, 1);
             this.bg.boundsPadding = 0;
             this.bg.drawRect(0, 0, this.game.width, this.game.height);
             this.bg.tint = 0x000000;
 
-            //make paddlas, ball and effects.
-            this.ball = new Ball( this.game.world.centerX, this.game.world.centerY, this.game)
+            //make paddles, ball and effects.
+            this.ball = new Ball(this.game.world.centerX, this.game.world.centerY, this.game);
             this.paddle1 = new PlayerPaddle(this.game, 50, this.game.world.height / 2, Phaser.Keyboard.W, Phaser.Keyboard.S);
             this.paddle2 = new ComputerPaddle(this.game, this.game.world.width - 50, this.game.world.height / 2, this.ball);
-            this.after_images =  new AfterImage(30, this.game);
-
+            this.after_images = new AfterImage(30, this.game);
 
             //draw play field
-            let graphics= this.game.add.graphics(0,0);
+            let graphics: Phaser.Graphics = this.game.add.graphics(0, 0);
             graphics.lineStyle(4, 0xffffff, 0.5);
-            graphics.moveTo(this.game.width/2, 0);
-            graphics.lineTo(this.game.width/2, this.game.height);
+            graphics.moveTo(this.game.width / 2, 0);
+            graphics.lineTo(this.game.width / 2, this.game.height);
             graphics.lineStyle(20, 0xffffff, 1);
             graphics.moveTo(0, 0);
             graphics.lineTo(this.game.width, 0);
@@ -89,57 +86,54 @@ module BoilerPlate {
 
             this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR).onDown.add(this.launch_ball, this);
 
-            this.controls_sprite1 = this.game.add.sprite(100,this.game.height/2,Images.Controls_1);
+            this.controls_sprite1 = this.game.add.sprite(100, this.game.height / 2, Images.Controls_1);
             this.controls_sprite1.anchor.set(.5);
             this.controls_sprite1.scale.set(.2);
 
-            this.controls_sprite2 = this.game.add.sprite(this.game.width -100,this.game.height/2,Images.Controls_2);
+            this.controls_sprite2 = this.game.add.sprite(this.game.width - 100, this.game.height / 2, Images.Controls_2);
             this.controls_sprite2.anchor.set(.5);
             this.controls_sprite2.scale.set(.2);
-            this.controls_sprite1.alpha =this.controls_sprite2.alpha = 0;
+            this.controls_sprite1.alpha = this.controls_sprite2.alpha = 0;
 
-
-                this.score1 = this.score2 = 0;
-            this.score_text = new Label(this.game, this.game.world.width/2,60, '0   0',{
+            this.score1 = this.score2 = 0;
+            this.score_text = new Label(this.game, this.game.world.width / 2, 60, '0   0', {
                     font: '64px Pong',
-                    fill:'#fff',
-                    align: 'center'}
+                    fill: '#fff',
+                    align: 'center'
+                }
                 , 400, 100);
             this.score_text.anchor.set(0.5);
 
-            this.click_to_start_text = this.game.add.text(this.game.world.centerX, this.game.world.centerY-60,'',{
+            this.click_to_start_text = this.game.add.text(this.game.world.centerX, this.game.world.centerY - 60, '', {
                 font: '15px Pong',
-                    fill:'#fff',
-                    align: 'center'
+                fill: '#fff',
+                align: 'center'
             });
             this.click_to_start_text.anchor.set(0.5);
 
-            this.resultMenu = new PauseMenu(this.game.width/2, this.game.height/2, this.game,  '', "Retry", "Back to menu",this, false);
-            this.pauseMenu = new PauseMenu(this.game.width/2, this.game.height/2, this.game, "pause", "Resume", "Back to menu",this, true);
-            this.pauseBtn = this.game.add.button(80, 50, Images.Pause, this.pauseMenu.ToggleShow , this.pauseMenu, 2, 1, 0);
-
-
+            this.resultMenu = new PauseMenu(this.game.width / 2, this.game.height / 2, this.game, '', 'Retry', 'Back to menu', this, false);
+            this.pauseMenu = new PauseMenu(this.game.width / 2, this.game.height / 2, this.game, 'pause', 'Resume', 'Back to menu', this, true);
+            this.pauseBtn = this.game.add.button(80, 50, Images.Pause, this.pauseMenu.ToggleShow, this.pauseMenu, 2, 1, 0);
 
             this.in_game = false;
-            this.menu = new Main_Menu(this.game.width/2, this.game.height/2, this.game, this);
-
+            this.menu = new Main_Menu(this.game.width / 2, this.game.height / 2, this.game, this);
 
             this.filter = new Void_Filter(this.game);
-            this.sprite = this.game.add.sprite( 0,0);
+            this.sprite = this.game.add.sprite(0, 0);
             this.sprite.width = this.game.width;
             this.sprite.height = this.game.height;
             this.sprite.alpha = 0.1;
-            this.sprite.filters = [ this.filter.filter_effect ];
+            this.sprite.filters = [this.filter.filter_effect];
 
-            SoundManager.getInstance().play(Sounds.menu_music,0,true);
+            SoundManager.getInstance().play(Sounds.menu_music, 0, true);
 
             //this.game.camera.fade(0x000000, 4000);
             this.render_after_images();
         }
 
-        public back_to_menu():void{
+        public back_to_menu(): void {
             SoundManager.getInstance().play(Sounds.Biep);
-            SoundManager.getInstance().play(Sounds.menu_music,0,true);
+            SoundManager.getInstance().play(Sounds.menu_music, 0, true);
             SoundManager.getInstance().stop(Sounds.in_game_music);
 
             this.in_game = false;
@@ -147,44 +141,44 @@ module BoilerPlate {
             this.ball.reset_ball(this.game);
             this.in_pause = true;
 
-            this.paddle2.y = this.paddle1.y =  this.game.world.height/2;
+            this.paddle2.y = this.paddle1.y = this.game.world.height / 2;
 
         }
-        public launch_ball(): void{
 
-            if(this.in_game)
-            {
+        public launch_ball(): void {
+
+            if (this.in_game) {
                 this.ball.launch();
                 this.click_to_start_text.text = '';
 
                 this.removeControlSprite(this.controls_sprite1);
                 this.removeControlSprite(this.controls_sprite2);
-
-
             }
         }
-        public removeControlSprite(sprite:Phaser.Sprite):void{
+
+        public removeControlSprite(sprite: Phaser.Sprite): void {
             this.game.tweens.removeFrom(sprite);
-            this.game.add.tween(sprite).to( { alpha: 0 }, 200, Phaser.Easing.Linear.None, true, 0);
+            this.game.add.tween(sprite).to({alpha: 0}, 200, Phaser.Easing.Linear.None, true, 0);
         }
 
-        public async render_after_images():Promise<string>{
+        public async render_after_images(): Promise<string> {
             await this.delay(50);
-            if(!this.in_pause && this.ball.ball_launched){
-                this.after_images.help(this.ball.x,this.ball.y);
+            if (!this.in_pause && this.ball.ball_launched) {
+                this.after_images.help(this.ball.x, this.ball.y);
             }
             this.render_after_images();
             return null;
 
         }
+
         public delay(ms: number): Promise<string> {
             return new Promise(resolve => setTimeout(resolve, ms));
         }
+
         public update(): void {
 
             //this.ball.calculate_after_image();
-            if(!this.in_pause)
-            {
+            if (!this.in_pause) {
                 this.paddle1.update_position();
                 this.paddle2.update_position();
                 this.collission_detection();
@@ -195,74 +189,68 @@ module BoilerPlate {
         }
 
         //collision of the ball with the paddles and ball with the two edges are handled here.
-        public collission_detection(): void{
+        public collission_detection(): void {
 
-            this.game.physics.arcade.collide(this.paddle1,this.ball,
-                (function(scope){
-                    return function(){
+            this.game.physics.arcade.collide(this.paddle1, this.ball,
+                (function (scope) {
+                    return function (): void {
                         SoundManager.getInstance().play(Sounds.Biep2);
-                        scope.redirect_ball(scope.paddle1,scope.ball);
+                        scope.redirect_ball(scope.paddle1, scope.ball);
                     };
                 })(this));
-            this.game.physics.arcade.collide(this.paddle2,this.ball,
-                (function(scope){
-                    return function(){
+            this.game.physics.arcade.collide(this.paddle2, this.ball,
+                (function (scope) {
+                    return function (): void {
                         SoundManager.getInstance().play(Sounds.Biep);
-                        scope.redirect_ball(scope.paddle2,scope.ball);
+                        scope.redirect_ball(scope.paddle2, scope.ball);
                     };
                 })(this));
-            if(this.ball.body.blocked.left){
+            if (this.ball.body.blocked.left) {
 
-                this.after_images.help2(this.ball.x,this.ball.y,30,1, 0xFF0000);
+                this.after_images.help2(this.ball.x, this.ball.y, 30, 1, 0xFF0000);
                 this.someone_scored(false);
-            }
-            else if (this.ball.body.blocked.right){
-                this.after_images.help2(this.ball.x,this.ball.y,30,1, 0xFF0000);
+            } else if (this.ball.body.blocked.right) {
+                this.after_images.help2(this.ball.x, this.ball.y, 30, 1, 0xFF0000);
                 this.someone_scored(true);
             }
         }
-        public someone_scored(you_scored:boolean):void{
-            this.game.camera.shake(.01,100);
 
-            this.game.add.tween(this.score_text).to( { alpha: 0 }, 200, Phaser.Easing.Linear.None, true, 0, 0, true);
+        public someone_scored(you_scored: boolean): void {
+            this.game.camera.shake(.01, 100);
+
+            this.game.add.tween(this.score_text).to({alpha: 0}, 200, Phaser.Easing.Linear.None, true, 0, 0, true);
             this.ball.reset_ball(this.game);
             this.paddle1.reset_speed();
             this.paddle2.reset_speed();
-            this.paddle2.y  =  this.game.world.height/2;
-            if(you_scored){
+            this.paddle2.y = this.game.world.height / 2;
+            if (you_scored) {
                 this.score1++;
-                if(this.score1 == this.end_score)
-                {
-                    if(this.menu.player_count == 2)
-                    {
-                        this.game_ends("Player 1 wins!");
-                    } else{
-                        this.game_ends("You've won!");
+                if (this.score1 === this.end_score) {
+                    if (this.menu.player_count === 2) {
+                        this.game_ends('Player 1 wins!');
+                    } else {
+                        this.game_ends('You have won!');
                     }
-                }
-                else{
+                } else {
                     this.UI_Flicker();
                 }
-            }
-            else{
+            } else {
                 this.score2++;
-                if(this.score2 == this.end_score)
-                {
-                    if(this.menu.player_count == 2)
-                    {
-                        this.game_ends("Player 2 wins!");
-                    } else{
-                        this.game_ends("You've lost");
+                if (this.score2 === this.end_score) {
+                    if (this.menu.player_count === 2) {
+                        this.game_ends('Player 2 wins!');
+                    } else {
+                        this.game_ends('You have lost');
                     }
-                }
-                else {
+                } else {
                     this.UI_Flicker();
                 }
             }
-            this.score_text.text = this.score1 +'   '+ this.score2;
+            this.score_text.text = this.score1 + '   ' + this.score2;
 
         }
-        public game_ends(result: string):void{
+
+        public game_ends(result: string): void {
             this.in_game = false;
             this.click_to_start_text.text = '';
             this.pauseBtn.visible = false;
@@ -271,14 +259,14 @@ module BoilerPlate {
 
         }
 
-        public restart():void{
+        public restart(): void {
             SoundManager.getInstance().stop(Sounds.menu_music);
-            SoundManager.getInstance().play(Sounds.in_game_music, 0,true);
+            SoundManager.getInstance().play(Sounds.in_game_music, 0, true);
 
             this.bg.tint = 0x000000;
 
             this.score1 = this.score2 = 0;
-            this.score_text.text = this.score1 +'   '+ this.score2;
+            this.score_text.text = this.score1 + '   ' + this.score2;
 
             this.pauseBtn.visible = true;
             this.UI_Flicker();
@@ -286,80 +274,73 @@ module BoilerPlate {
             this.in_pause = false;
 
             this.paddle2.destroy();
-            if(this.menu.player_count == 2){
+            if (this.menu.player_count === 2) {
                 this.paddle2 = new PlayerPaddle(this.game, this.game.world.width - 50, this.game.world.height / 2, Phaser.Keyboard.UP, Phaser.Keyboard.DOWN);
-                this.game.add.tween(this.controls_sprite2).to( { alpha: .5 }, 400, Phaser.Easing.Linear.None, true, 0, 600, true).loop(true);
-            }
-            else{
+                this.game.add.tween(this.controls_sprite2).to({alpha: .5}, 400, Phaser.Easing.Linear.None, true, 0, 600, true).loop(true);
+            } else {
                 this.paddle2 = new ComputerPaddle(this.game, this.game.world.width - 50, this.game.world.height / 2, this.ball);
             }
             this.paddle1.reset_speed();
             this.game.add.existing(this.paddle2);
             this.game_layer.add(this.paddle2);
 
-
             this.ball.x = this.game.world.centerX;
             this.ball.y = this.game.world.centerY;
 
-            this.game.add.tween(this.controls_sprite1).to( { alpha: .5 }, 400, Phaser.Easing.Linear.None, true, 0, 600, true).loop(true);
+            this.game.add.tween(this.controls_sprite1).to({alpha: .5}, 400, Phaser.Easing.Linear.None, true, 0, 600, true).loop(true);
 
             this.controls_show();
 
         }
 
-        private async controls_show(): Promise<string>{
-            await this.delay(100);
-            if(this.paddle1.y != this.game.world.height / 2){
-                this.removeControlSprite(this.controls_sprite1);
-            }
-            if(this.paddle2.y != this.game.world.height / 2){
-                this.removeControlSprite(this.controls_sprite2);
-
-            }
-            if(this.paddle1.y == this.game.world.height / 2 || (this.paddle2.y == this.game.world.height / 2 && this.menu.player_count == 2)){
-                this.controls_show();
-            }
-
-
-
-            return null;
-        }
-
-        private componentToHex(c:number): string {
-            let hex = c.toString(16);
-            return hex.length == 1 ? "0" + hex : hex;
-        }
-
-
-        private rgbToHex(r:number, g:number, b:number):number {
-            return parseInt("0x" + this.componentToHex(r) + this.componentToHex(g) + this.componentToHex(b));
-        }
-
-
         //gives the ball an angle of direction based on where the ball is hitted
-        public redirect_ball(paddle:Paddle,ball:Ball): void{
-            this.game.camera.shake(.0025 ,100);
+        public redirect_ball(paddle: Paddle, ball: Ball): void {
+            this.game.camera.shake(.0025, 100);
             this.paddle1.accelerate();
             this.paddle2.accelerate();
 
             this.after_images.help2(ball.x, ball.y);
-            this.bg.tint = this.rgbToHex(Math.round(Math.random()*100),Math.round(Math.random()*100),Math.round(Math.random()*100));
-            let dx = -paddle.x + ball.x;
-            let dy = (-paddle.y + /*paddle.body.velocity.y/20 +*/ ball.y)/2;
-            let root = Math.sqrt(Math.pow(dx,2)+Math.pow(dy,2));
+            this.bg.tint = this.rgbToHex(Math.round(Math.random() * 100), Math.round(Math.random() * 100), Math.round(Math.random() * 100));
+            let dx: number = -paddle.x + ball.x;
+            let dy: number = (-paddle.y + /*paddle.body.velocity.y/20 +*/ ball.y) / 2;
+            let root: number = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
             dx /= root;
             dy /= root;
             ball.accelerate();
             ball.body.velocity.setTo(
-                dx*ball.ball_velocity,
-                dy*ball.ball_velocity
-            )
+                dx * ball.ball_velocity,
+                dy * ball.ball_velocity
+            );
         }
 
-        public UI_Flicker():void{
+        public UI_Flicker(): void {
             this.click_to_start_text.text = 'press spacebar to start!';
             this.click_to_start_text.alpha = 0.1;
-            this.game.add.tween(this.click_to_start_text).to( { alpha: 1 }, 200, Phaser.Easing.Linear.None, true, 0, 600, true).loop(true);
+            this.game.add.tween(this.click_to_start_text).to({alpha: 1}, 200, Phaser.Easing.Linear.None, true, 0, 600, true).loop(true);
+        }
+
+        private async controls_show(): Promise<string> {
+            await this.delay(100);
+            if (this.paddle1.y !== this.game.world.height / 2) {
+                this.removeControlSprite(this.controls_sprite1);
+            }
+            if (this.paddle2.y !== this.game.world.height / 2) {
+                this.removeControlSprite(this.controls_sprite2);
+
+            }
+            if (this.paddle1.y === this.game.world.height / 2 || (this.paddle2.y === this.game.world.height / 2 && this.menu.player_count === 2)) {
+                this.controls_show();
+            }
+            return null;
+        }
+
+        private componentToHex(c: number): string {
+            let hex: string = c.toString(16);
+            return hex.length === 1 ? '0' + hex : hex;
+        }
+
+        private rgbToHex(r: number, g: number, b: number): number {
+            return parseInt('0x' + this.componentToHex(r) + this.componentToHex(g) + this.componentToHex(b), 0);
         }
     }
 }
