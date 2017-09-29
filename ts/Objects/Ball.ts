@@ -1,8 +1,11 @@
+import Emitter = Phaser.Particles.Arcade.Emitter;
+
 class Ball extends Phaser.Graphics {
     public ball_velocity: number = 500;
     public ball_launched: boolean = false;
     public min_velocity: number = 500;
     public max_velocity: number = 800;
+    private emitter: Emitter;
 
     constructor(x: number, y: number, game: Fabrique.IGame) {
         super(game, x, y);
@@ -17,6 +20,11 @@ class Ball extends Phaser.Graphics {
         this.body.bounce.setTo(1, 1);
         this.scale.set(1, 1);
         this.body.velocity.x = 0;
+
+        let temp: Phaser.Graphics = game.add.graphics(0, 0);
+
+        temp.beginFill(0xFFFFFF);
+        temp.drawCircle(0, 0, 20);
 
     }
 

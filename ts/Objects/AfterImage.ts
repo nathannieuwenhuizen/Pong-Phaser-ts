@@ -27,24 +27,14 @@ class AfterImage {
         }
     }
 
-    public lower_alpha_after_images(): void {
-        for (let i: number = 0; i < this.after_images.length; i++) {
-            this.after_images[i].alpha -= 0.01;
-            this.after_images[i].width -= 0.2;
-            this.after_images[i].height -= 0.2;
-        }
-        for (let i: number = 0; i < this.bounce_images.length; i++) {
-            this.bounce_images[i].alpha -= 0.02;
-            this.bounce_images[i].width += 2;
-            this.bounce_images[i].height += 2;
-        }
-    }
-
     public help(x: number, y: number): void {
         this.after_images[this.index].x = x;
         this.after_images[this.index].y = y;
         this.after_images[this.index].alpha = .5;
         this.after_images[this.index].height = this.after_images[this.index].width = 20;
+
+        game.add.tween(this.after_images[this.index]).to({alpha: 0, width: 5, height: 5}, 1000, 'Linear', true);
+
         if (this.index >= this.after_images.length - 1) {
             this.index = 1;
         } else {
@@ -58,6 +48,9 @@ class AfterImage {
         this.bounce_images[this.index2].alpha = alpha;
         this.bounce_images[this.index2].tint = tint;
         this.bounce_images[this.index2].height = this.bounce_images[this.index2].width = width;
+
+        game.add.tween(this.bounce_images[this.index2]).to({alpha: 0, width: 100, height: 100}, 800, 'Linear', true);
+
         if (this.index2 >= this.bounce_images.length - 1) {
             this.index2 = 1;
         } else {

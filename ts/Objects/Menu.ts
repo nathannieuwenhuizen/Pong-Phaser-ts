@@ -53,6 +53,8 @@ class MainMenu {
         this.graphics.addChild(this.mode_button);
         this.graphics.addChild(this.label);
         this.graphics.addChild(this.sound_image);
+        this.switch_sound();
+
 
     }
 
@@ -97,13 +99,16 @@ class MainMenu {
     }
 
     public switch_sound(): void {
-        if (Sounds.volume === 1) {
+
+        if (!this.game.sound.mute) {
             Sounds.volume = 0;
             this.sound_image.loadTexture(Images.Sound_Off);
+            this.game.sound.mute = true;
             SoundManager.getInstance().stop(Sounds.menu_music);
         } else {
             Sounds.volume = 1;
             this.sound_image.loadTexture(Images.Sound_On);
+            this.game.sound.mute = false;
             SoundManager.getInstance().play(Sounds.menu_music, Sounds.volume * 0.5, true);
 
         }

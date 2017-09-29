@@ -3,11 +3,10 @@ module BoilerPlate {
     export class Gameplay extends Phaser.State implements Fabrique.IState {
         public static Name: string = 'gameplay';
         public static pause: boolean = false;
+        public static is_on_mobile: boolean;
         public name: string = Gameplay.Name;
         public game: Fabrique.IGame;
-
         public menu: MainMenu;
-
         public in_pause: boolean;
         public in_game: boolean;
         public end_score: number = 5;
@@ -42,6 +41,8 @@ module BoilerPlate {
         public create(): void {
             super.create();
 
+            Gameplay.is_on_mobile = this.isMobile();
+            console.log(Gameplay.is_on_mobile);
             //Send a screen view to Google to track different states
             // this.game.analytics.google.sendScreenView(this.name);
             //this.background = this.game.add.image(0, 0, Atlases.Interface, 'bg_gameplay');
@@ -79,7 +80,11 @@ module BoilerPlate {
             this.game_layer.addChild(this.ball);
             //this.game_layer.addChild(this.after_images);
 
-            this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR).onDown.add(this.launch_ball, this);
+            if (Gameplay.is_on_mobile) {
+                this.game.input.onDown.add(this.launch_ball, this);
+            } else {
+                this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR).onDown.add(this.launch_ball, this);
+            }
 
             this.controls_sprite1 = this.game.add.sprite(100, this.game.height / 2, Images.Controls_1);
             this.controls_sprite1.anchor.set(.5);
@@ -124,6 +129,7 @@ module BoilerPlate {
 
             //this.game.camera.fade(0x000000, 4000);
             this.render_after_images();
+            //this.game.ads.showAd();
         }
 
         public pause_button_clicked(): void {
@@ -175,10 +181,8 @@ module BoilerPlate {
                 this.paddle1.update_position();
                 this.paddle2.update_position();
                 this.collission_detection();
-                this.after_images.lower_alpha_after_images();
             }
             this.filter.filter_effect.update(0);
-
         }
 
         //collision of the ball with the paddles and ball with the two edges are handled here.
@@ -198,8 +202,7 @@ module BoilerPlate {
             } else if (this.ball.body.blocked.right) {
                 this.after_images.help2(this.ball.x, this.ball.y, 30, 1, 0xFF0000);
                 this.someone_scored(true);
-            }
-            if (this.ball.body.blocked.up || this.ball.body.blocked.down) {
+            } else if (this.ball.body.blocked.up || this.ball.body.blocked.down) {
                 SoundManager.getInstance().play(Sounds.Biep, Sounds.volume * 0.5);
             }
         }
@@ -309,10 +312,31 @@ module BoilerPlate {
         }
 
         public UI_Flicker(): void {
-            this.click_to_start_text.text = 'press spacebar to start!';
+            if (!Gameplay.is_on_mobile) {
+                this.click_to_start_text.text = 'press spacebar to start!';
+            } else {
+                this.click_to_start_text.text = 'click to start!';
+            }
             this.click_to_start_text.alpha = 0.1;
+            //this.click_to_start_text.
             this.game.add.tween(this.click_to_start_text).to({alpha: 1}, 200, Phaser.Easing.Linear.None, true, 0, 600, true).loop(true);
         }
+
+        public isMobile(): boolean {
+            if (navigator.userAgent.match(/Android/i)
+                || navigator.userAgent.match(/webOS/i)
+                || navigator.userAgent.match(/iPhone/i)
+                || navigator.userAgent.match(/iPad/i)
+                || navigator.userAgent.match(/iPod/i)
+                || navigator.userAgent.match(/BlackBerry/i)
+                || navigator.userAgent.match(/Windows Phone/i)
+            ) {
+                Constants.GAME_SCALE = 0.25;
+                return true;
+            } else {
+                return false;
+            }
+        };
 
         private controls_show(): void {
             setTimeout((x: number) => {

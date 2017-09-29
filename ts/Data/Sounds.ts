@@ -26,7 +26,7 @@ class Sounds {
         Sounds.win,
         Sounds.lose
     ];
-    public static volume: number = 1;
+    public static volume: number = 0;
     /**
      * A list of all audio we need after the preloader.
      */

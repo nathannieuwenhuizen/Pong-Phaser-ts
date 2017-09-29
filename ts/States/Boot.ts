@@ -91,6 +91,8 @@ module BoilerPlate {
                 Constants.GAMEDISTRIBUTION_ID,
                 Constants.GAMEDISTRIBUTION_USER
             ));
+            console.log("show add!");
+            this.game.ads.showAd();
 
             //Enable scaling
             if (this.game.device.desktop) {
@@ -229,10 +231,11 @@ module BoilerPlate {
                 }
             });
 
+            /*
             Fabrique.LoaderHelper.hide();
             this.game.state.start(Menu.Name);
             this.game.ads.onContentPaused.removeAll();
-            this.game.ads.onContentResumed.removeAll();
+            this.game.ads.onContentResumed.removeAll();*/
         }
 
         /**

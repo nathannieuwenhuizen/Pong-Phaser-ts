@@ -17,6 +17,7 @@ class PlayerPaddle extends Paddle {
 
     public update_position(): void {
         //this.y = Math.min(Math.max(y, this.top_cordinate_y), this.bottom_cordinate_y);
+
         if (this.up_input.isDown) {
             this.body.velocity.y = -this.speed;
             if (this.down_input.isDown) {
@@ -24,6 +25,20 @@ class PlayerPaddle extends Paddle {
             }
         } else if (this.down_input.isDown) {
             this.body.velocity.y = this.speed;
+        } else {
+            this.body.velocity.y = 0;
+        }
+    }
+
+    public update_position_touch(): void {
+
+        if (this.game.input.activePointer.isDown) {
+            console.log(game.input.y);
+            if (this.game.input.y > this.game.height / 2) {
+                this.body.velocity.y = this.speed;
+            } else {
+                this.body.velocity.y = -this.speed;
+            }
         } else {
             this.body.velocity.y = 0;
         }
