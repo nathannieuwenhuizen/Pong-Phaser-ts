@@ -12,6 +12,55 @@ module BoilerPlate {
         }
 
         /**
+         * Called every time the orientation on mobile device changes.
+         * @param manager
+         */
+        public static mobileResizeCallback(manager: Phaser.ScaleManager): void {
+            let width: number = window.innerWidth;
+            let height: number = window.innerHeight;
+
+            Boot.setScaling(manager.game);
+
+            let usedWidth: number = Constants.GAME_WIDTH * Constants.GAME_SCALE;
+            let usedHeight: number = Constants.GAME_HEIGHT * Constants.GAME_SCALE;
+
+            let scaleFactor: number = 1;
+
+            //So first we check if the game is beeing played in landscape
+            if (width > height) {
+                scaleFactor /= height / usedHeight;
+            } else {
+                scaleFactor /= height / usedWidth;
+            }
+
+            Constants.CALCULATED_WIDTH = Math.ceil(width * scaleFactor);
+            Constants.CALCULATED_HEIGHT = Math.ceil(height * scaleFactor);
+
+            manager.setGameSize(Constants.CALCULATED_WIDTH, Constants.CALCULATED_HEIGHT);
+            manager.setUserScale(1 / scaleFactor, 1 / scaleFactor);
+        }
+
+        /**
+         * Calculates the right scaling based on the inner size of the window.
+         * Only used for mobile devices, because on desktop the default scale is always 1.
+         * @returns {number}
+         */
+        private static setScaling(game: Phaser.Game): void {
+            //Check if the device is in portrait mode, and if so, override the width with the innerHeight.
+            //We want to determine the scaling based on the the biggest side.
+            let width: number = window.innerWidth > window.innerHeight ? window.innerWidth : window.innerHeight;
+            width *= game.device.pixelRatio;
+
+            if (width < 650) {
+                Constants.GAME_SCALE = 0.5;
+            } else if (width > 1050) {
+                Constants.GAME_SCALE = 1;
+            } else {
+                Constants.GAME_SCALE = 0.75;
+            }
+        }
+
+        /**
          * Init, this is where game and google analytics are set up.
          * Small tweaks such as limiting input pointers, disabling right click context menu are placed here
          */
@@ -102,55 +151,6 @@ module BoilerPlate {
             }
         }
 
-        /**
-         * Called every time the orientation on mobile device changes.
-         * @param manager
-         */
-        public static mobileResizeCallback(manager: Phaser.ScaleManager): void {
-            let width: number = window.innerWidth;
-            let height: number = window.innerHeight;
-
-            Boot.setScaling(manager.game);
-
-            let usedWidth: number = Constants.GAME_WIDTH * Constants.GAME_SCALE;
-            let usedHeight: number = Constants.GAME_HEIGHT * Constants.GAME_SCALE;
-
-            let scaleFactor: number = 1;
-
-            //So first we check if the game is beeing played in landscape
-            if (width > height) {
-                scaleFactor /= height / usedHeight;
-            } else {
-                scaleFactor /= height / usedWidth;
-            }
-
-            Constants.CALCULATED_WIDTH = Math.ceil(width * scaleFactor);
-            Constants.CALCULATED_HEIGHT = Math.ceil(height * scaleFactor);
-
-            manager.setGameSize(Constants.CALCULATED_WIDTH, Constants.CALCULATED_HEIGHT);
-            manager.setUserScale(1 / scaleFactor, 1 / scaleFactor);
-        }
-
-        /**
-         * Calculates the right scaling based on the inner size of the window.
-         * Only used for mobile devices, because on desktop the default scale is always 1.
-         * @returns {number}
-         */
-        private static setScaling(game: Phaser.Game): void {
-            //Check if the device is in portrait mode, and if so, override the width with the innerHeight.
-            //We want to determine the scaling based on the the biggest side.
-            let width: number = window.innerWidth > window.innerHeight ? window.innerWidth : window.innerHeight;
-            width *= game.device.pixelRatio;
-
-            if (width < 650) {
-                Constants.GAME_SCALE = 0.5;
-            } else if (width > 1050) {
-                Constants.GAME_SCALE = 1;
-            } else {
-                Constants.GAME_SCALE = 0.75;
-            }
-        }
-
         public preload(): void {
             this.game.load.cacheBuster = (typeof version === 'undefined') ? null : version;
 
@@ -228,7 +228,6 @@ module BoilerPlate {
                     Fabrique.Branding.preloadImages(this.game);
                 }
             });
-
 
             Fabrique.LoaderHelper.hide();
             this.game.state.start(Menu.Name);

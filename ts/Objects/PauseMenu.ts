@@ -1,6 +1,5 @@
 import LabeledButton = BoilerPlate.LabeledButton;
 import Gameplay = BoilerPlate.Gameplay;
-import Label = BoilerPlate.Label;
 import SoundManager = BoilerPlate.SoundManager;
 
 class PauseMenu {
@@ -8,10 +7,9 @@ class PauseMenu {
     public testGrBtn2: LabeledButton;
     public graphics: Phaser.Graphics;
     public gamePlay: Gameplay;
-    public label: Label;
+    public label: Phaser.Text;
     public game: Fabrique.IGame;
     public x: number;
-    Ð
     public y: number;
 
     constructor(_x: number, _y: number, game: Fabrique.IGame, title: string, text_top: string, text_bottom: string, gamePlay: Gameplay, resume_or_restart: boolean = false) {
@@ -29,13 +27,13 @@ class PauseMenu {
         this.graphics.fillAlpha = 1;
         this.graphics.lineStyle(5, 0xffffff, 1);
 
-        var callBack_top;
+        let callBack_top: any;
         if (resume_or_restart) {
             callBack_top = this.Resume;
         } else {
             callBack_top = this.restart;
         }
-        var callback_bottom = this.back_to_menu;
+        let callback_bottom: any = this.back_to_menu;
 
         this.graphics.drawRect(this.x - 150 - 50, this.y - 100 - 50, 400, 360);
         this.testGrBtn = new LabeledButton(game, this.x, this.y, text_top, {
@@ -57,12 +55,11 @@ class PauseMenu {
         this.testGrBtn2.events.onInputOver.add(this.button_hover, this.testGrBtn);
         this.testGrBtn2.events.onInputOut.add(this.button_unhover, this.testGrBtn);
 
-        this.label = new Label(game, this.x, this.y - 100, title, {
-                font: '33px Pong',
-                fill: '#fff',
-                align: 'center'
-            }
-            , 400, 100);
+        this.label = new Phaser.Text(game, this.x, this.y - 100, title, {
+            font: '33px Pong',
+            fill: '#fff',
+            align: 'center'
+        });
         this.label.anchor.set(0.5);
 
         this.graphics.addChild(this.testGrBtn);

@@ -1,8 +1,8 @@
-class Void_Filter {
+class VoidFilter {
     public filter_effect: any;
 
     constructor(game: Fabrique.IGame) {
-        let fragmentSrc = [
+        let fragmentSrc: string[] = [
 
             'precision mediump float;',
 

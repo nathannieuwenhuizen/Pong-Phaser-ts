@@ -21,7 +21,7 @@ class Images {
         Images.Controls_1,
         Images.Controls_2,
         Images.Sound_On,
-        Images.Sound_Off,
+        Images.Sound_Off
     ];
 
     /**

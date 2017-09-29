@@ -1,11 +1,9 @@
-import Label = BoilerPlate.Label;
-
-class Main_Menu {
+class MainMenu {
     public graphics: Phaser.Graphics;
     public game: Fabrique.IGame;
     public testGrBtn: LabeledButton;
     public mode_button: LabeledButton;
-    public label: Label;
+    public label: Phaser.Text;
     public gameplay: Gameplay;
     public player_count: number = 1;
     private sound_image: Phaser.Sprite;
@@ -38,12 +36,11 @@ class Main_Menu {
         this.mode_button.events.onInputOver.add(this.button_hover, this.mode_button);
         this.mode_button.events.onInputOut.add(this.button_unhover, this.mode_button);
 
-        this.label = new Label(game, x, y - 200, 'PONG', {
-                font: '100px Pong',
-                fill: '#fff',
-                align: 'center'
-            }
-            , 400, 100);
+        this.label = new Phaser.Text(game, x, y - 200, 'PONG', {
+            font: '100px Pong',
+            fill: '#fff',
+            align: 'center'
+        });
         this.label.anchor.set(0.5);
 
         this.sound_image = game.add.sprite(game.width - 50, game.height - 50, Images.Sound_On);
@@ -74,7 +71,6 @@ class Main_Menu {
 
         this.testGrBtn.alpha = 1;
         this.game.tweens.removeFrom(this.testGrBtn);
-
 
         this.gameplay.restart();
         this.graphics.visible = false;

@@ -1,13 +1,12 @@
 module BoilerPlate {
 
-
     export class Gameplay extends Phaser.State implements Fabrique.IState {
         public static Name: string = 'gameplay';
         public static pause: boolean = false;
         public name: string = Gameplay.Name;
         public game: Fabrique.IGame;
 
-        public menu: Main_Menu;
+        public menu: MainMenu;
 
         public in_pause: boolean;
         public in_game: boolean;
@@ -22,7 +21,7 @@ module BoilerPlate {
         private click_to_start_text: Phaser.Text;
         private paddle1: PlayerPaddle;
         private bg: Phaser.Graphics;
-        private filter: Void_Filter;
+        private filter: VoidFilter;
         private sprite: Phaser.Sprite;
         private pauseMenu: PauseMenu;
         private pauseBtn: Phaser.Button;
@@ -112,9 +111,9 @@ module BoilerPlate {
             this.pauseBtn = this.game.add.button(80, 50, Images.Pause, this.pause_button_clicked.bind(this), this.pauseMenu, 2, 1, 0);
 
             this.in_game = false;
-            this.menu = new Main_Menu(this.game.width / 2, this.game.height / 2, this.game, this);
+            this.menu = new MainMenu(this.game.width / 2, this.game.height / 2, this.game, this);
 
-            this.filter = new Void_Filter(this.game);
+            this.filter = new VoidFilter(this.game);
             this.sprite = this.game.add.sprite(0, 0);
             this.sprite.width = this.game.width;
             this.sprite.height = this.game.height;
@@ -161,23 +160,17 @@ module BoilerPlate {
             this.game.add.tween(sprite).to({alpha: 0}, 200, Phaser.Easing.Linear.None, true, 0);
         }
 
-        public async render_after_images(): Promise<string> {
-            await this.delay(50);
-            if (!this.in_pause && this.ball.ball_launched) {
-                this.after_images.help(this.ball.x, this.ball.y);
-            }
-            this.render_after_images();
-            return null;
+        public render_after_images(): void {
+            setInterval((x: number) => {
+                if (!this.in_pause && this.ball.ball_launched) {
+                    this.after_images.help(this.ball.x, this.ball.y);
+                }
+            }, 50);
 
-        }
-
-        public delay(ms: number): Promise<string> {
-            return new Promise(resolve => setTimeout(resolve, ms));
         }
 
         public update(): void {
 
-            //this.ball.calculate_after_image();
             if (!this.in_pause) {
                 this.paddle1.update_position();
                 this.paddle2.update_position();
@@ -321,19 +314,19 @@ module BoilerPlate {
             this.game.add.tween(this.click_to_start_text).to({alpha: 1}, 200, Phaser.Easing.Linear.None, true, 0, 600, true).loop(true);
         }
 
-        private async controls_show(): Promise<string> {
-            await this.delay(100);
-            if (this.paddle1.y !== this.game.world.height / 2) {
-                this.removeControlSprite(this.controls_sprite1);
-            }
-            if (this.paddle2.y !== this.game.world.height / 2) {
-                this.removeControlSprite(this.controls_sprite2);
+        private controls_show(): void {
+            setTimeout((x: number) => {
+                if (this.paddle1.y !== this.game.world.height / 2) {
+                    this.removeControlSprite(this.controls_sprite1);
+                }
+                if (this.paddle2.y !== this.game.world.height / 2) {
+                    this.removeControlSprite(this.controls_sprite2);
 
-            }
-            if (this.paddle1.y === this.game.world.height / 2 || (this.paddle2.y === this.game.world.height / 2 && this.menu.player_count === 2)) {
-                this.controls_show();
-            }
-            return null;
+                }
+                if (this.paddle1.y === this.game.world.height / 2 || (this.paddle2.y === this.game.world.height / 2 && this.menu.player_count === 2)) {
+                    this.controls_show();
+                }
+            }, 100);
         }
 
         private componentToHex(c: number): string {
