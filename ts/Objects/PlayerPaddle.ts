@@ -33,7 +33,7 @@ class PlayerPaddle extends Paddle {
     public update_position_touch(): void {
 
         if (this.game.input.activePointer.isDown) {
-            console.log(game.input.y);
+            console.log(this.game.input.y);
             if (this.game.input.y > this.game.height / 2) {
                 this.body.velocity.y = this.speed;
             } else {

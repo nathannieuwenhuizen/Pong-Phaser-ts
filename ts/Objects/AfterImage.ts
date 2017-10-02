@@ -3,9 +3,10 @@ class AfterImage {
     public bounce_images: any;
     public index: number = 1;
     public index2: number = 1;
+    public game: Fabrique.IGame;
 
     constructor(amount: number, game: Fabrique.IGame) {
-
+        this.game = game;
         this.after_images = new Array(Phaser.Graphics);
         this.bounce_images = new Array(Phaser.Graphics);
         console.log(typeof this.after_images);
@@ -33,7 +34,7 @@ class AfterImage {
         this.after_images[this.index].alpha = .5;
         this.after_images[this.index].height = this.after_images[this.index].width = 20;
 
-        game.add.tween(this.after_images[this.index]).to({alpha: 0, width: 5, height: 5}, 1000, 'Linear', true);
+        this.game.add.tween(this.after_images[this.index]).to({alpha: 0, width: 5, height: 5}, 1000, 'Linear', true);
 
         if (this.index >= this.after_images.length - 1) {
             this.index = 1;
@@ -49,7 +50,11 @@ class AfterImage {
         this.bounce_images[this.index2].tint = tint;
         this.bounce_images[this.index2].height = this.bounce_images[this.index2].width = width;
 
-        game.add.tween(this.bounce_images[this.index2]).to({alpha: 0, width: 100, height: 100}, 800, 'Linear', true);
+        this.game.add.tween(this.bounce_images[this.index2]).to({
+            alpha: 0,
+            width: 100,
+            height: 100
+        }, 800, 'Linear', true);
 
         if (this.index2 >= this.bounce_images.length - 1) {
             this.index2 = 1;
