@@ -22,7 +22,6 @@ class Ball extends Phaser.Graphics {
 
         temp.beginFill(0xFFFFFF);
         temp.drawCircle(0, 0, 20);
-
     }
 
     public launch(): void {
