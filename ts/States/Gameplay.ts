@@ -6,7 +6,6 @@ module BoilerPlate {
         public static is_on_mobile: boolean;
         public name: string = Gameplay.Name;
         public game: Fabrique.IGame;
-        public menu: MainMenu;
         public in_pause: boolean;
         public in_game: boolean;
         public end_score: number = 5;
@@ -32,6 +31,27 @@ module BoilerPlate {
             super();
         }
 
+        public static isMobile(): boolean {
+            if (navigator.userAgent.match(/Android/i)
+                || navigator.userAgent.match(/webOS/i)
+                || navigator.userAgent.match(/iPhone/i)
+                || navigator.userAgent.match(/iPad/i)
+                || navigator.userAgent.match(/iPod/i)
+                || navigator.userAgent.match(/BlackBerry/i)
+                || navigator.userAgent.match(/Windows Phone/i)
+            ) {
+                Constants.GAME_SCALE = 0.25;
+                return true;
+            } else {
+                return false;
+            }
+        };
+
+        public static componentToHex(c: number): string {
+            let hex: string = c.toString(16);
+            return hex.length === 1 ? '0' + hex : hex;
+        }
+
         public init(): void {
             this.game.world.removeAll();
             SoundManager.getInstance(this.game);
@@ -41,7 +61,7 @@ module BoilerPlate {
         public create(): void {
             super.create();
 
-            Gameplay.is_on_mobile = this.isMobile();
+            Gameplay.is_on_mobile = Gameplay.isMobile();
             console.log(Gameplay.is_on_mobile);
             //Send a screen view to Google to track different states
             // this.game.analytics.google.sendScreenView(this.name);
@@ -116,8 +136,6 @@ module BoilerPlate {
             this.pauseBtn = this.game.add.button(80, 50, Images.Pause, this.pause_button_clicked.bind(this), this.pauseMenu, 2, 1, 0);
 
             this.in_game = false;
-            this.menu = new MainMenu(this.game.width / 2, this.game.height / 2, this.game, this);
-
             this.filter = new VoidFilter(this.game);
             this.sprite = this.game.add.sprite(0, 0);
             this.sprite.width = this.game.width;
@@ -130,6 +148,7 @@ module BoilerPlate {
             //this.game.camera.fade(0x000000, 4000);
             this.render_after_images();
             //this.game.ads.showAd();
+            this.restart();
         }
 
         public pause_button_clicked(): void {
@@ -140,14 +159,14 @@ module BoilerPlate {
         public back_to_menu(): void {
             SoundManager.getInstance().play(Sounds.menu_music, Sounds.volume * 0.5, true);
             SoundManager.getInstance().stop(Sounds.in_game_music);
-
+            /*
             this.in_game = false;
-            this.menu.back_to_menu();
+            //this.menu.back_to_menu();
             this.ball.reset_ball(this.game);
             this.in_pause = true;
 
-            this.paddle2.y = this.paddle1.y = this.game.world.height / 2;
-
+            this.paddle2.y = this.paddle1.y = this.game.world.height / 2;*/
+            this.game.state.add(Menu.Name, Menu, true);
         }
 
         public launch_ball(): void {
@@ -169,6 +188,7 @@ module BoilerPlate {
         public render_after_images(): void {
             setInterval((x: number) => {
                 if (!this.in_pause && this.ball.ball_launched) {
+                    console.log(x);
                     this.after_images.help(this.ball.x, this.ball.y);
                 }
             }, 50);
@@ -220,7 +240,7 @@ module BoilerPlate {
                 this.score1++;
                 if (this.score1 === this.end_score) {
                     SoundManager.getInstance().play(Sounds.win, Sounds.volume);
-                    if (this.menu.player_count === 2) {
+                    if (Constants.PLAYER_COUNT === 2) {
                         this.game_ends('Player 1 wins!');
                     } else {
                         this.game_ends('You have won!');
@@ -231,7 +251,7 @@ module BoilerPlate {
             } else {
                 this.score2++;
                 if (this.score2 === this.end_score) {
-                    if (this.menu.player_count === 2) {
+                    if (Constants.PLAYER_COUNT === 2) {
                         SoundManager.getInstance().play(Sounds.win, Sounds.volume);
                         this.game_ends('Player 2 wins!');
                     } else {
@@ -257,7 +277,7 @@ module BoilerPlate {
 
         public restart(): void {
             SoundManager.getInstance().stop(Sounds.menu_music);
-            SoundManager.getInstance().play(Sounds.in_game_music, Sounds.volume * 1, true);
+            SoundManager.getInstance().play(Sounds.in_game_music, Sounds.volume, true);
 
             this.bg.tint = 0x000000;
 
@@ -270,7 +290,7 @@ module BoilerPlate {
             this.in_pause = false;
 
             this.paddle2.destroy();
-            if (this.menu.player_count === 2) {
+            if (Constants.PLAYER_COUNT === 2) {
                 this.paddle2 = new PlayerPaddle(this.game, this.game.world.width - 50, this.game.world.height / 2, Phaser.Keyboard.UP, Phaser.Keyboard.DOWN);
                 this.game.add.tween(this.controls_sprite2).to({alpha: .5}, 400, Phaser.Easing.Linear.None, true, 0, 600, true).loop(true);
             } else {
@@ -322,24 +342,9 @@ module BoilerPlate {
             this.game.add.tween(this.click_to_start_text).to({alpha: 1}, 200, Phaser.Easing.Linear.None, true, 0, 600, true).loop(true);
         }
 
-        public isMobile(): boolean {
-            if (navigator.userAgent.match(/Android/i)
-                || navigator.userAgent.match(/webOS/i)
-                || navigator.userAgent.match(/iPhone/i)
-                || navigator.userAgent.match(/iPad/i)
-                || navigator.userAgent.match(/iPod/i)
-                || navigator.userAgent.match(/BlackBerry/i)
-                || navigator.userAgent.match(/Windows Phone/i)
-            ) {
-                Constants.GAME_SCALE = 0.25;
-                return true;
-            } else {
-                return false;
-            }
-        };
-
         private controls_show(): void {
             setTimeout((x: number) => {
+                console.log(x);
                 if (this.paddle1.y !== this.game.world.height / 2) {
                     this.removeControlSprite(this.controls_sprite1);
                 }
@@ -347,19 +352,14 @@ module BoilerPlate {
                     this.removeControlSprite(this.controls_sprite2);
 
                 }
-                if (this.paddle1.y === this.game.world.height / 2 || (this.paddle2.y === this.game.world.height / 2 && this.menu.player_count === 2)) {
+                if (this.paddle1.y === this.game.world.height / 2 || (this.paddle2.y === this.game.world.height / 2 && Constants.PLAYER_COUNT === 2)) {
                     this.controls_show();
                 }
             }, 100);
         }
 
-        private componentToHex(c: number): string {
-            let hex: string = c.toString(16);
-            return hex.length === 1 ? '0' + hex : hex;
-        }
-
         private rgbToHex(r: number, g: number, b: number): number {
-            return parseInt('0x' + this.componentToHex(r) + this.componentToHex(g) + this.componentToHex(b), 0);
+            return parseInt('0x' + Gameplay.componentToHex(r) + Gameplay.componentToHex(g) + Gameplay.componentToHex(b), 0);
         }
     }
 }
