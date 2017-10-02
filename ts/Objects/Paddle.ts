@@ -1,5 +1,3 @@
-import game = PIXI.game;
-
 class Paddle extends Phaser.Graphics {
     public speed: number = 400;
     public min_speed: number = 400;
@@ -27,6 +25,6 @@ class Paddle extends Phaser.Graphics {
 
     public reset_speed(): void {
         this.speed = this.min_speed;
-        this.y = game.height / 2;
+        this.y = this.game.height / 2;
     }
 }
