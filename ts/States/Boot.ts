@@ -91,7 +91,7 @@ module BoilerPlate {
                 Constants.GAMEDISTRIBUTION_ID,
                 Constants.GAMEDISTRIBUTION_USER
             ));
-            console.log("show add!");
+            console.log('show add!');
             this.game.ads.showAd();
 
             //Enable scaling

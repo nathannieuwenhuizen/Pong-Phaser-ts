@@ -1,11 +1,8 @@
-import Emitter = Phaser.Particles.Arcade.Emitter;
-
 class Ball extends Phaser.Graphics {
     public ball_velocity: number = 500;
     public ball_launched: boolean = false;
     public min_velocity: number = 500;
     public max_velocity: number = 800;
-    private emitter: Emitter;
 
     constructor(x: number, y: number, game: Fabrique.IGame) {
         super(game, x, y);

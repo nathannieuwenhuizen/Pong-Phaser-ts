@@ -55,7 +55,6 @@ class MainMenu {
         this.graphics.addChild(this.sound_image);
         this.switch_sound();
 
-
     }
 
     public button_hover(button: LabeledButton): void {
